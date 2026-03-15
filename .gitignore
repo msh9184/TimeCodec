@@ -45,3 +45,17 @@ CVS
 Backup[ ]of[ ]*.pages/
 Backup[ ]of[ ]*.key/
 Backup[ ]of[ ]*.numbers
+
+# Project-specific
+docs/
+*.tmp
+*.pdf
+scratch/
+question.txt
+CLAUDE.md
+outputs/
+results/
+.claude
+
+# Error log
+errlog*
