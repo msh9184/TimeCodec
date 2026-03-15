@@ -1,3 +1,4 @@
+#!/bin/bash
 # you have to process each dataset before you can run this file
 
 python anomaly_detection/combine_datasets.py \
@@ -16,9 +17,6 @@ python anomaly_detection/train_vqvae.py \
     --config_path anomaly_detection/scripts/all.json \
     --model_init_num_gpus 0 \
     --data_init_cpu_or_gpu cpu \
-    --comet_log \
-    --comet_tag pipeline \
-    --comet_name all \
     --save_path "anomaly_detection/saved_models/ALL/" \
     --base_path "anomaly_detection/data/ALL/revin_data/"\
     --batchsize 4096 \
@@ -49,7 +47,7 @@ ar=1
 seed=47
 python anomaly_detection/detect_anomaly.py \
        --dataset $dt\
-       --trained_vqvae_model_path "anomaly_detection/saved_models/ALL/ <fill in  proper path> _seed"$seed"/checkpoints/final_model.pth" \
+       --trained_vqvae_model_path "anomaly_detection/saved_models/ALL/CD64_CW1024_CF4_BS4096_ITR120000_seed${seed}/checkpoints/final_model.pth" \
        --compression_factor 4 \
        --base_path "anomaly_detection/data/"$dt"/revin_data"\
        --labels_path "anomaly_detection/data/"$dt""\
@@ -83,7 +81,7 @@ ar=2
 seed=47
 python anomaly_detection/detect_anomaly.py \
        --dataset $dt\
-       --trained_vqvae_model_path "anomaly_detection/saved_models/ALL/ <fill in  proper path> _seed"$seed"/checkpoints/final_model.pth" \
+       --trained_vqvae_model_path "anomaly_detection/saved_models/ALL/CD64_CW1024_CF4_BS4096_ITR120000_seed${seed}/checkpoints/final_model.pth" \
        --compression_factor 4 \
        --base_path "process_zero_shot_data/data/anomaly_detection/"$dt"/"\
        --labels_path "process_zero_shot_data/data/anomaly_detection/"$dt"/"\

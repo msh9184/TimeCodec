@@ -1,9 +1,9 @@
+import argparse
 import numpy as np
 import os
 
 
-def main():
-    base_path = 'imputation/data/'
+def main(base_path='imputation/data/'):
 
     all_train_notrevin_x = []
     all_train_revin_x = []
@@ -42,8 +42,7 @@ def main():
 
     print('test_done')
 
-    if not os.path.exists(base_path + 'all'):
-        os.makedirs(base_path + 'all')
+    os.makedirs(base_path + 'all', exist_ok=True)
 
     np.save(base_path + 'all/train_notrevin_x.npy', all_train_notrevin_x_arr)
     np.save(base_path + 'all/train_revin_x.npy', all_train_revin_x_arr)
@@ -56,4 +55,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Combine individual dataset files into a single "all" dataset')
+    parser.add_argument('--base_path', type=str, default='imputation/data/',
+                        help='base path containing individual dataset folders')
+    args = parser.parse_args()
+
+    # Ensure trailing slash
+    bp = args.base_path
+    if not bp.endswith('/'):
+        bp += '/'
+
+    main(base_path=bp)

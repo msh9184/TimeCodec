@@ -1,5 +1,4 @@
 # code from https://github.com/ts-kim/RevIN, with minor modifications
-import pdb
 import torch
 import torch.nn as nn
 
@@ -35,8 +34,6 @@ class RevIN(nn.Module):
     def _get_statistics(self, x):
         dim2reduce = tuple(range(1, x.ndim-1))
         if self.subtract_last:
-            print('in subtract last')
-            pdb.set_trace()
             self.last = x[:,-1,:].unsqueeze(1)
         else:
             self.mean = torch.mean(x, dim=dim2reduce, keepdim=True).detach()
@@ -44,29 +41,21 @@ class RevIN(nn.Module):
 
     def _normalize(self, x):
         if self.subtract_last:
-            print('in subtract last')
-            pdb.set_trace()
             x = x - self.last
         else:
             x = x - self.mean
         x = x / self.stdev
         if self.affine:
-            print('in self affine')
-            pdb.set_trace()
             x = x * self.affine_weight
             x = x + self.affine_bias
         return x
 
     def _denormalize(self, x):
         if self.affine:
-            print('in self affine')
-            pdb.set_trace()
             x = x - self.affine_bias
             x = x / (self.affine_weight + self.eps*self.eps)
         x = x * self.stdev
         if self.subtract_last:
-            print('in subtract last')
-            pdb.set_trace()
             x = x + self.last
         else:
             x = x + self.mean

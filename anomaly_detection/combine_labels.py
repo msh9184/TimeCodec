@@ -1,5 +1,4 @@
 import argparse
-import pdb
 import numpy as np
 import torch
 import os
@@ -26,10 +25,8 @@ def main(args):
 
     all_test_labels_arr = np.concatenate(all_test_labels, axis=0)
 
-    if not os.path.exists(args.save_path):
-        os.makedirs(args.save_path)
+    os.makedirs(args.save_path, exist_ok=True)
 
-    pdb.set_trace()
     np.save(args.save_path + 'test_labels_processed.npy', all_test_labels_arr, allow_pickle=True)
 
 

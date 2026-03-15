@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 import os
-import pdb
+import warnings
 import torch
 
 from data_provider.data_factory import data_provider
@@ -32,7 +32,7 @@ class ExtractData:
                 if batch_x.shape[-1] == batch_y.shape[-1]:
                     num_sensors = batch_x.shape[-1]
                 else:
-                    pdb.set_trace()
+                    raise ValueError(f'Mismatched sensor dimensions: batch_x has {batch_x.shape[-1]}, batch_y has {batch_y.shape[-1]}')
 
             x_original_all.append(batch_x)
             y_original_all.append(batch_y)
@@ -79,22 +79,20 @@ class ExtractData:
         data_dict['codebook'] = np.array(codebook.detach().cpu())
 
         # Check to make sure sensors are last
-        if data_dict['x_original_arr'].shape[-1] == num_sensors:
-            if data_dict['y_original_arr'].shape[-1] == num_sensors:
-                if data_dict['x_code_ids_all_arr'].shape[-1] == num_sensors:
-                    if data_dict['x_reverted_all_arr'].shape[-1] == num_sensors:
-                        if data_dict['y_reverted_all_arr'].shape[-1] == num_sensors:
-                            print('Sensors are last')
-                        else:
-                            pdb.set_trace()
-                    else:
-                        pdb.set_trace()
-                else:
-                    pdb.set_trace()
-            else:
-                pdb.set_trace()
-        else:
-            pdb.set_trace()
+        checks = [
+            ('x_original_arr', data_dict['x_original_arr']),
+            ('y_original_arr', data_dict['y_original_arr']),
+            ('x_code_ids_all_arr', data_dict['x_code_ids_all_arr']),
+            ('x_reverted_all_arr', data_dict['x_reverted_all_arr']),
+            ('y_reverted_all_arr', data_dict['y_reverted_all_arr']),
+        ]
+        all_ok = True
+        for name, arr in checks:
+            if arr.shape[-1] != num_sensors:
+                warnings.warn(f'{name} last dim is {arr.shape[-1]}, expected {num_sensors} sensors')
+                all_ok = False
+        if all_ok:
+            print('Sensors are last')
 
         print(data_dict['x_original_arr'].shape, data_dict['y_original_arr'].shape)
         print(data_dict['x_code_ids_all_arr'].shape, data_dict['y_code_ids_all_arr'].shape)
@@ -105,8 +103,8 @@ class ExtractData:
 
 
     def extract_data(self):
-        device = 'cuda:' + str(args.gpu)
-        vqvae_model = torch.load(args.trained_vqvae_model_path)
+        device = 'cuda:' + str(self.args.gpu)
+        vqvae_model = torch.load(self.args.trained_vqvae_model_path)
         vqvae_model.to(device)
         vqvae_model.eval()
 
@@ -114,7 +112,7 @@ class ExtractData:
         vali_data, vali_loader = self._get_data(flag='val')
         test_data, test_loader = self._get_data(flag='test')
 
-        if args.classifiy_or_forecast == 'forecast':
+        if self.args.classifiy_or_forecast == 'forecast':
             print('FORECASTING')
 
             if not os.path.exists(self.args.save_path):
@@ -273,7 +271,7 @@ if __name__ == '__main__':
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 
     if args.use_gpu and args.use_multi_gpu:
-        args.dvices = args.devices.replace(' ', '')
+        args.devices = args.devices.replace(' ', '')
         device_ids = args.devices.split(',')
         args.device_ids = [int(id_) for id_ in device_ids]
         args.gpu = args.device_ids[0]

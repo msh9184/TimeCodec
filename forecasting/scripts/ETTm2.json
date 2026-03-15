@@ -14,10 +14,5 @@
         "commitment_cost": 0.25,
         "compression_factor": 4,
         "dataset": "ETTm2"
-    },
-    "comet_config": {
-        "api_key": "add yours here",
-        "project_name": "add yours here",
-        "workspace": "add yours here"
     }
 }

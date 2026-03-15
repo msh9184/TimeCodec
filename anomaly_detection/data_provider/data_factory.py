@@ -1,5 +1,3 @@
-import pdb
-
 from data_provider.data_loader import MSLSegLoader, PSMSegLoader, SMAPSegLoader, SMDSegLoader, SWATSegLoader
 from torch.utils.data import DataLoader
 
@@ -44,4 +42,4 @@ def data_provider(args, flag):
         return data_set, data_loader
 
     else:
-        pdb.set_trace()
+        raise ValueError(f"Unsupported task_name: {args.task_name}")

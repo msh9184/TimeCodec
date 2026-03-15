@@ -1,5 +1,4 @@
 import argparse
-import pdb
 import numpy as np
 import torch
 import os
@@ -37,10 +36,7 @@ def main(args):
     all_train = np.concatenate(all_train, axis=0)
     all_test = np.concatenate(all_test, axis=0)
 
-    if not os.path.exists(args.save_path):
-        os.makedirs(args.save_path)
-
-    pdb.set_trace()
+    os.makedirs(args.save_path, exist_ok=True)
 
     np.save(args.save_path + 'train.npy', all_train, allow_pickle=True)
     np.save(args.save_path + 'test.npy', all_test, allow_pickle=True)

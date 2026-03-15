@@ -1,6 +1,7 @@
 gpu=1
 seq_len=96
-root_path_name=/add/your/own/path
+DATA_ROOT=${DATA_ROOT:-/add/your/own/path}
+root_path_name=$DATA_ROOT
 data_path_name=ETTm2.csv
 data_name=ETTm2
 random_seed=2021
@@ -29,7 +30,6 @@ python imputation/train_vqvae.py \
   --config_path imputation/scripts/ETTm2.json \
   --model_init_num_gpus $gpu \
   --data_init_cpu_or_gpu cpu \
-  --comet_log \
   --comet_tag pipeline \
   --comet_name vqvae_ETTm2 \
   --save_path "imputation/saved_models/ETTm2/mask_ratio_"$mask_ratio"/"\
@@ -47,7 +47,7 @@ for mask_ratio_test in 0.125 0.25 0.375 0.5
 do
 python imputation/imputation_performance.py \
   --dataset ETTm2 \
-  --trained_vqvae_model_path "imputation/saved_models/ETTm2/ <fill in right path> /checkpoints/final_model.pth" \
+  --trained_vqvae_model_path "imputation/saved_models/ETTm2/<fill_in_right_path>/checkpoints/final_model.pth" \
   --compression_factor 4 \
   --gpu 0 \
   --base_path "imputation/data" \

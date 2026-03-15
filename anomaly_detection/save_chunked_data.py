@@ -1,5 +1,4 @@
 import argparse
-import pdb
 import os
 import numpy as np
 import data_provider.data_factory as data_factory
@@ -34,24 +33,22 @@ def process_data(args):
     print(all_test_labels.shape)
 
     if all_train.shape[1] != args.seq_len or all_train.shape[2] != args.num_vars:
-        print('train shape off')
-        pdb.set_trace()
+        raise ValueError(f'Train shape mismatch: expected seq_len={args.seq_len}, num_vars={args.num_vars}, '
+                         f'got shape {all_train.shape}')
 
     if all_test.shape[1] != args.seq_len or all_test.shape[2] != args.num_vars:
-        print('test shape off')
-        pdb.set_trace()
+        raise ValueError(f'Test shape mismatch: expected seq_len={args.seq_len}, num_vars={args.num_vars}, '
+                         f'got shape {all_test.shape}')
 
     if all_test_labels.shape[1] != args.seq_len:
-        print('test labels shape off')
-        pdb.set_trace()
+        raise ValueError(f'Test labels shape mismatch: expected seq_len={args.seq_len}, '
+                         f'got shape {all_test_labels.shape}')
 
     if all_test.shape[0] != all_test_labels.shape[0]:
-        print('something funky with test sizes ')
-        pdb.set_trace()
+        raise ValueError(f'Test size mismatch: test has {all_test.shape[0]} samples but '
+                         f'labels has {all_test_labels.shape[0]} samples')
 
-    pdb.set_trace()
-    if not os.path.exists(args.save_path):
-        os.makedirs(args.save_path)
+    os.makedirs(args.save_path, exist_ok=True)
     np.save(args.save_path + 'train_data_processed.npy', all_train, allow_pickle=True)
     np.save(args.save_path + 'test_data_processed.npy', all_test, allow_pickle=True)
     np.save(args.save_path + 'test_labels_processed.npy', all_test_labels, allow_pickle=True)

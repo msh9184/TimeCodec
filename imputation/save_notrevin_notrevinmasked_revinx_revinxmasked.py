@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import os
-import pdb
 import random
 import torch
 
@@ -51,7 +50,8 @@ class ExtractData:
 
         print('Flattening Sensors Out')
         if self.args.seq_len != 96 and self.args.pred_len != 0 :
-            pdb.set_trace()
+            raise ValueError(f'Unsupported seq_len={self.args.seq_len} with pred_len={self.args.pred_len}. '
+                             f'Expected seq_len=96 and pred_len=0.')
         else:
             # These have dimension [bs x nvars, ntime]
             x_train_arr = np.swapaxes(x_train_in_revin_space_arr, 1,2).reshape((-1, self.args.seq_len))
@@ -65,8 +65,7 @@ class ExtractData:
             print(x_train_arr.shape, x_val_arr.shape, x_test_arr.shape)
             print(orig_x_train_arr.shape, orig_x_val_arr.shape, orig_x_test_arr.shape)
 
-        if not os.path.exists(self.args.save_path):
-            os.makedirs(self.args.save_path)
+        os.makedirs(self.args.save_path, exist_ok=True)
 
         np.save(self.args.save_path + '/train_revin_x.npy', x_train_arr)
         np.save(self.args.save_path + '/val_revin_x.npy', x_val_arr)
@@ -127,7 +126,7 @@ if __name__ == '__main__':
     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 
     if args.use_gpu and args.use_multi_gpu:
-        args.dvices = args.devices.replace(' ', '')
+        args.devices = args.devices.replace(' ', '')
         device_ids = args.devices.split(',')
         args.device_ids = [int(id_) for id_ in device_ids]
         args.gpu = args.device_ids[0]
@@ -145,7 +144,7 @@ if __name__ == '__main__':
     elif 'ETT' in args.data and args.enc_in == 7:
         pass
     else:
-        pdb.set_trace()
+        print('WARNING: enc_in value may not match the dataset. Please verify.')
 
     print('Args in experiment:')
     print(args)

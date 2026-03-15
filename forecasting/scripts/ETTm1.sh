@@ -1,10 +1,13 @@
+# Configure DATA_ROOT to point to the directory containing your raw CSV data files
+DATA_ROOT="${DATA_ROOT:-/path/to/your/data}"
+
 seq_len=96
-root_path_name=/add/your/own/path
+root_path_name=$DATA_ROOT
 data_path_name=ETTm1.csv
 data_name=ETTm1
 random_seed=2021
 pred_len=96
-gpu=4
+gpu=0
 
 python -u forecasting/save_revin_data.py \
   --random_seed $random_seed \
@@ -24,15 +27,12 @@ python forecasting/train_vqvae.py \
   --config_path forecasting/scripts/ETTm1.json \
   --model_init_num_gpus $gpu \
   --data_init_cpu_or_gpu cpu \
-  --comet_log \
-  --comet_tag pipeline \
-  --comet_name vqvae_ETTm1 \
   --save_path "forecasting/saved_models/ETTm1/"\
   --base_path "forecasting/data"\
   --batchsize 4096
 
 random_seed=2021
-root_path_name=/add/your/own/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=ETTm1.csv
 model_id_name=ETTm1
 data_name=ETTm1
@@ -52,7 +52,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 7 \
   --gpu $gpu\
   --save_path "forecasting/data/ETTm1/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path 'add/path/to/trained/vqvae'\
+  --trained_vqvae_model_path "forecasting/saved_models/ETTm1/checkpoints/final_model.pth"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done

@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import os
-import pdb
 
 
 def check_and_save_codebook(args, data_folders):

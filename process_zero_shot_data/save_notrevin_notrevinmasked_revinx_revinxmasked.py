@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import os
-import pdb
 import random
 import torch
 
@@ -51,7 +50,7 @@ class ExtractData:
 
         print('Flattening Sensors Out')
         if self.args.seq_len != 96 and self.args.pred_len != 0 :
-            pdb.set_trace()
+            raise ValueError(f"Unsupported seq_len={self.args.seq_len} with pred_len={self.args.pred_len}. Expected seq_len=96 or pred_len=0.")
         else:
             # These have dimension [bs x nvars, ntime]
             x_train_arr = np.swapaxes(x_train_in_revin_space_arr, 1,2).reshape((-1, self.args.seq_len))
@@ -142,7 +141,7 @@ if __name__ == '__main__':
     elif 'saugeen' in args.data_path and args.data == 'saugeen' and args.enc_in == 1:
         pass
     else:
-        pdb.set_trace()
+        raise ValueError(f"Unrecognized data configuration: data_path={args.data_path}, data={args.data}, enc_in={args.enc_in}")
 
     print('Args in experiment:')
     print(args)

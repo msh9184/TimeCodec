@@ -1,8 +1,8 @@
 import argparse
 import numpy as np
 import os
-import pdb
 import random
+import warnings
 import torch
 
 from data_provider.data_factory import data_provider
@@ -55,7 +55,8 @@ class ExtractData:
 
         print('Flattening Sensors Out')
         if self.args.seq_len != self.args.pred_len:
-            pdb.set_trace()
+            raise ValueError(f'seq_len ({self.args.seq_len}) != pred_len ({self.args.pred_len}). '
+                             'This code path requires seq_len == pred_len for flattening.')
         else:
             # These have dimension [bs x nvars, ntime]
             x_train_arr = np.swapaxes(x_train_in_revin_space_arr, 1,2).reshape((-1, self.args.pred_len))
@@ -142,7 +143,8 @@ if __name__ == '__main__':
     elif 'ETT' in args.data and args.enc_in == 7:
         pass
     else:
-        pdb.set_trace()
+        warnings.warn('Data/enc_in configuration does not match any known dataset. '
+                      'Please verify --data, --data_path, and --enc_in arguments.')
 
     print('Args in experiment:')
     print(args)

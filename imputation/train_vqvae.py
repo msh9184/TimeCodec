@@ -1,9 +1,12 @@
 import argparse
-import comet_ml
+try:
+    import comet_ml
+    HAS_COMET = True
+except ImportError:
+    HAS_COMET = False
 import json
 import numpy as np
 import os
-import pdb
 import random
 import time
 import torch
@@ -13,14 +16,24 @@ from time import gmtime, strftime
 from torch.utils.data import TensorDataset
 
 
+class PrintLogger:
+    """Fallback logger that prints metrics when Comet ML is not available."""
+    def log_parameters(self, params):
+        print(f'[Logger] Parameters: {params}')
+
+    def log_metric(self, name, value):
+        print(f'[Logger] {name}: {value}')
+
+    def add_tag(self, tag):
+        print(f'[Logger] Tag: {tag}')
+
+    def set_name(self, name):
+        print(f'[Logger] Experiment name: {name}')
+
+
 def main(device, config, save_dir, logger, data_init_loc, args):
     # Create/overwrite checkpoints folder and results folder
-    if os.path.exists(os.path.join(save_dir, 'checkpoints')):
-        print('Checkpoint Directory Already Exists - if continue will overwrite files inside. Press c to continue.')
-        pdb.set_trace()
-    else:
-        os.makedirs(os.path.join(save_dir, 'checkpoints'))
-
+    os.makedirs(os.path.join(save_dir, 'checkpoints'), exist_ok=True)
 
     logger.log_parameters(config)
 
@@ -33,11 +46,7 @@ def main(device, config, save_dir, logger, data_init_loc, args):
     print('CONFIG FILE TO SAVE:', config)
 
     # Create Configs folder
-    if os.path.exists(os.path.join(save_dir, 'configs')):
-        print('Saved Config Directory Already Exists - if continue will overwrite files inside. Press c to continue.')
-        pdb.set_trace()
-    else:
-        os.makedirs(os.path.join(save_dir, 'configs'))
+    os.makedirs(os.path.join(save_dir, 'configs'), exist_ok=True)
 
     # Save the json copy
     with open(os.path.join(save_dir, 'configs', 'config_file.json'), 'w+') as f:
@@ -117,10 +126,11 @@ def train_model(model, device, vqvae_config, save_dir, logger, args):
                 model.shared_eval(tensor_all_data_in_batch, inp, optimizer, 'train', comet_logger=logger)
 
             if epoch % 10000 == 0:
-                comet_logger.log_metric('train_vqvae_loss_each_batch', loss.item())
-                comet_logger.log_metric('train_vqvae_vq_loss_each_batch', vq_loss.item())
-                comet_logger.log_metric('train_vqvae_recon_loss_each_batch', recon_error.item())
-                comet_logger.log_metric('train_vqvae_perplexity_each_batch', perplexity.item())
+                if logger is not None:
+                    logger.log_metric('train_vqvae_loss_each_batch', loss.item())
+                    logger.log_metric('train_vqvae_vq_loss_each_batch', vq_loss.item())
+                    logger.log_metric('train_vqvae_recon_loss_each_batch', recon_error.item())
+                    logger.log_metric('train_vqvae_perplexity_each_batch', perplexity.item())
 
         # # uncomment if you want the validation
         # if epoch % 1000000 == 0:
@@ -184,8 +194,8 @@ def create_datloaders(batchsize=100, dataset="dummy", base_path='dummy', revined
         full_path = base_path + '/all'
 
     else:
-        print('Not done yet')
-        pdb.set_trace()
+        raise ValueError(f'Dataset "{dataset}" is not supported. '
+                         f'Supported datasets: weather, electricity, traffic, ETTh1, ETTm1, ETTh2, ETTm2, all')
 
 
     if revined_data == 'False':
@@ -288,7 +298,7 @@ if __name__ == '__main__':
     }
 
     # set up comet logger
-    if args.comet_log:
+    if args.comet_log and HAS_COMET:
         # Create an experiment with your api key
         comet_logger = comet_ml.Experiment(
             api_key=config['comet_config']['api_key'],
@@ -297,10 +307,12 @@ if __name__ == '__main__':
         )
         comet_logger.add_tag(args.comet_tag)
         comet_logger.set_name(args.comet_name)
+    elif args.comet_log and not HAS_COMET:
+        print('WARNING: --comet_log was set but comet_ml is not installed. Using print-based logging.')
+        comet_logger = PrintLogger()
     else:
-        print('PROBLEM: not saving to comet')
-        comet_logger = None
-        pdb.set_trace()
+        print('INFO: Comet logging disabled. Using print-based logging.')
+        comet_logger = PrintLogger()
 
     # Set up GPU / CPU
     if torch.cuda.is_available() and args.model_init_num_gpus >= 0:

@@ -1,5 +1,8 @@
+# Configure DATA_ROOT to point to the directory containing your raw CSV data files
+DATA_ROOT="${DATA_ROOT:-/path/to/your/data}"
+
 seq_len=96
-root_path_name=/add/your/own/path
+root_path_name=$DATA_ROOT
 data_path_name=electricity.csv
 data_name=custom
 random_seed=2021
@@ -24,15 +27,12 @@ python forecasting/train_vqvae.py \
   --config_path forecasting/scripts/electricity.json \
   --model_init_num_gpus $gpu \
   --data_init_cpu_or_gpu cpu \
-  --comet_log \
-  --comet_tag pipeline \
-  --comet_name vqvae_electricity \
   --save_path "forecasting/saved_models/electricity/"\
   --base_path "forecasting/data"\
   --batchsize 4096
 
 random_seed=2021
-root_path_name=/add/your/own/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=electricity.csv
 model_id_name=electricity
 data_name=custom
@@ -52,7 +52,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 321 \
   --gpu $gpu\
   --save_path "forecasting/data/electricity/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path 'add/path/to/trained/vqvae'\
+  --trained_vqvae_model_path "forecasting/saved_models/electricity/checkpoints/final_model.pth"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done

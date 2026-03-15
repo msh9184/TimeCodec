@@ -1,3 +1,8 @@
+# Configure DATA_ROOT to point to the directory containing your raw CSV data files
+DATA_ROOT="${DATA_ROOT:-/path/to/your/data}"
+# Configure VQVAE_MODEL_PATH to point to the trained "all" VQVAE model
+VQVAE_MODEL_PATH="${VQVAE_MODEL_PATH:-forecasting/saved_models/all/checkpoints/final_model.pth}"
+
 # have to process all datasets independently before running this
 
 python forecasting/combine_datasets_for_vqvae.py \
@@ -9,9 +14,6 @@ python forecasting/train_vqvae.py \
   --config_path forecasting/scripts/all.json \
   --model_init_num_gpus $gpu \
   --data_init_cpu_or_gpu cpu \
-  --comet_log \
-  --comet_tag pipeline \
-  --comet_name vqvae_all\
   --save_path "forecasting/saved_models/all/"\
   --base_path "forecasting/data"\
   --batchsize 4096
@@ -20,7 +22,7 @@ python forecasting/train_vqvae.py \
 # extract the weather, electricity, traffic, ETT datasets using the all vqvae
 
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=electricity.csv
 model_id_name=electricity
 data_name=custom
@@ -40,14 +42,14 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 321 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/electricity/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 seq_len=96
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=ETTh1.csv
 model_id_name=ETTh1
 data_name=ETTh1
@@ -66,14 +68,14 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 7\
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/ETTh1/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 seq_len=96
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=ETTh2.csv
 model_id_name=ETTh2
 data_name=ETTh2
@@ -92,13 +94,13 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 7\
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/ETTh2/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=ETTm1.csv
 model_id_name=ETTm1
 data_name=ETTm1
@@ -118,13 +120,13 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 7 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/ETTm1/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=ETTm2.csv
 model_id_name=ETTm2
 data_name=ETTm2
@@ -144,13 +146,13 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 7 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/ETTm2/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=traffic.csv
 model_id_name=traffic
 data_name=custom
@@ -170,14 +172,14 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 862 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/traffic/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
 
 gpu=1
 random_seed=2021
-root_path_name=/path/to/original/files
+root_path_name=$DATA_ROOT
 data_path_name=weather.csv
 model_id_name=weather
 data_name=custom
@@ -196,7 +198,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 21 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/weather/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
@@ -265,10 +267,10 @@ python -u forecasting/extract_forecasting_data.py \
   --seq_len $seq_len \
   --pred_len $pred_len \
   --label_len 0 \
-  --enc_in 1 \t
+  --enc_in 1 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/saugeen/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
@@ -293,7 +295,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 1 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/sunspot/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
@@ -318,7 +320,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 1 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/us_births/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
@@ -343,7 +345,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 72 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/neuro2/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done
@@ -368,7 +370,7 @@ python -u forecasting/extract_forecasting_data.py \
   --enc_in 106 \
   --gpu $gpu\
   --save_path "forecasting/data/all_vqvae_extracted/neuro5/Tin"$seq_len"_Tout"$pred_len"/"\
-  --trained_vqvae_model_path '/path/to/all/trained/vqvae'\
+  --trained_vqvae_model_path "$VQVAE_MODEL_PATH"\
   --compression_factor 4 \
   --classifiy_or_forecast "forecast"
 done

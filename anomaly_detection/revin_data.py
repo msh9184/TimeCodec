@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import os
-import pdb
 import torch
 from layers.RevIN import RevIN
 
@@ -67,11 +66,7 @@ if __name__ == '__main__':
     base_save_path = args.save_path
     num_features = args.num_vars
 
-    if not os.path.exists(base_save_path):
-        os.makedirs(base_save_path)
-    else:
-        print('The data path already exists')
-        pdb.set_trace()
+    os.makedirs(base_save_path, exist_ok=True)
 
     # do train first
     data_train = np.load(base_path + "train_data_processed.npy", allow_pickle=True)
@@ -86,12 +81,10 @@ if __name__ == '__main__':
     print(data_test_revined.shape)
 
     if data_train_revined.shape[1] != args.seq_len or data_train_revined.shape[2] != args.num_vars:
-        print('Train has shape problem')
-        pdb.set_trace()
+        raise ValueError(f'Train has shape problem: {data_train_revined.shape}')
 
     if data_test_revined.shape[1] != args.seq_len or data_test_revined.shape[2] != args.num_vars:
-        print('Test has shape problem')
-        pdb.set_trace()
+        raise ValueError(f'Test has shape problem: {data_test_revined.shape}')
 
     np.save(base_save_path + '/train.npy', data_train_revined, allow_pickle=True)
     np.save(base_save_path + '/test.npy', data_test_revined, allow_pickle=True)

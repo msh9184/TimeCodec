@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import os
-import pdb
 import torch
 import torch.nn as nn
 
@@ -118,8 +117,7 @@ def create_datloaders(batchsize=100, dataset="dummy", base_path='dummy', labels_
         # test_labels = np.load(os.path.join(labels_path, "test_labels_totem_shaped.npy"), allow_pickle=True)
 
     else:
-        print('Not done yet')
-        pdb.set_trace()
+        raise ValueError(f"Unsupported dataset: {dataset}")
 
 
     # need batch, sensor, time
@@ -213,16 +211,13 @@ def test(args):
             if i == 0:
 
                 if batch_x.shape[1] != args.num_vars or batch_x.shape[2] != args.seq_len:
-                    print('batch x shape is wrong')
-                    pdb.set_trace()
+                    raise ValueError(f'batch_x shape is wrong: {batch_x.shape}')
 
                 if batch_x_swapped.shape[1] != args.seq_len or batch_x_swapped.shape[2] != args.num_vars:
-                    print('batch_x_swapped shape is wrong')
-                    pdb.set_trace()
+                    raise ValueError(f'batch_x_swapped shape is wrong: {batch_x_swapped.shape}')
 
                 if x_predictions_revin_space.shape[1] != args.seq_len or x_predictions_revin_space.shape[2] != args.num_vars:
-                    print('x_predictions_revin_space shape is wrong')
-                    pdb.set_trace()
+                    raise ValueError(f'x_predictions_revin_space shape is wrong: {x_predictions_revin_space.shape}')
 
     attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)
     train_energy = np.array(attens_energy)
@@ -254,17 +249,14 @@ def test(args):
 
         if i == 0:
             if batch_x.shape[1] != args.num_vars or batch_x.shape[2] != args.seq_len:
-                print('batch x shape is wrong')
-                pdb.set_trace()
+                raise ValueError(f'batch_x shape is wrong: {batch_x.shape}')
 
             if batch_x_swapped.shape[1] != args.seq_len or batch_x_swapped.shape[2] != args.num_vars:
-                print('batch_x_swapped shape is wrong')
-                pdb.set_trace()
+                raise ValueError(f'batch_x_swapped shape is wrong: {batch_x_swapped.shape}')
 
             if x_predictions_revin_space.shape[1] != args.seq_len or x_predictions_revin_space.shape[
                 2] != args.num_vars:
-                print('x_predictions_revin_space shape is wrong')
-                pdb.set_trace()
+                raise ValueError(f'x_predictions_revin_space shape is wrong: {x_predictions_revin_space.shape}')
 
 
     attens_energy = np.concatenate(attens_energy, axis=0).reshape(-1)

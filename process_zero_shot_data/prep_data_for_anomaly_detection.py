@@ -1,4 +1,3 @@
-import pdb
 import numpy as np
 import torch
 import os
@@ -41,7 +40,7 @@ def main(args):
     test_notrevin = test_notrevin[cutoff:, :]
 
     if test_revin.shape != test_notrevin.shape:
-        pdb.set_trace()
+        raise ValueError(f"Shape mismatch: test_revin {test_revin.shape} != test_notrevin {test_notrevin.shape}")
 
     mask_ratio = 0.02  # 2% of the data
 

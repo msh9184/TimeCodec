@@ -1,4 +1,3 @@
-import pdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -451,10 +450,11 @@ class vqvae(BaseModel):
                 recon_error = F.mse_loss(data_recon, batch)
                 loss = recon_error + vq_loss
 
-        comet_logger.log_metric(f'{mode}_vqvae_loss_each_batch', loss.item())
-        comet_logger.log_metric(f'{mode}_vqvae_vq_loss_each_batch', vq_loss.item())
-        comet_logger.log_metric(f'{mode}_vqvae_recon_loss_each_batch', recon_error.item())
-        comet_logger.log_metric(f'{mode}_vqvae_perplexity_each_batch', perplexity.item())
+        if comet_logger is not None:
+            comet_logger.log_metric(f'{mode}_vqvae_loss_each_batch', loss.item())
+            comet_logger.log_metric(f'{mode}_vqvae_vq_loss_each_batch', vq_loss.item())
+            comet_logger.log_metric(f'{mode}_vqvae_recon_loss_each_batch', recon_error.item())
+            comet_logger.log_metric(f'{mode}_vqvae_perplexity_each_batch', perplexity.item())
 
         return loss, vq_loss, recon_error, data_recon, perplexity, embedding_weight, encoding_indices, encodings
 

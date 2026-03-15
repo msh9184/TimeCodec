@@ -1,9 +1,12 @@
 import argparse
-import comet_ml
+try:
+    import comet_ml
+    HAS_COMET = True
+except ImportError:
+    HAS_COMET = False
 import json
 import numpy as np
 import os
-import pdb
 import random
 import time
 import torch
@@ -11,13 +14,18 @@ from lib.models import get_model_class
 from time import gmtime, strftime
 
 
+class PrintLogger:
+    """Fallback logger that prints metrics when Comet ML is not available."""
+    def log_parameters(self, params):
+        print('[Logger] Parameters:', params)
+
+    def log_metric(self, name, value):
+        print(f'[Logger] {name}: {value}')
+
+
 def main(device, config, save_dir, logger, data_init_loc, args):
     # Create checkpoints folder and results folder
-    if os.path.exists(os.path.join(save_dir, 'checkpoints')):
-        print('Checkpoint Directory Already Exists - if continue will overwrite files inside. Press c to continue.')
-        pdb.set_trace()
-    else:
-        os.makedirs(os.path.join(save_dir, 'checkpoints'))
+    os.makedirs(os.path.join(save_dir, 'checkpoints'), exist_ok=True)
 
     logger.log_parameters(config)
 
@@ -30,11 +38,7 @@ def main(device, config, save_dir, logger, data_init_loc, args):
     print('CONFIG FILE TO SAVE:', config)
 
     # Create Configs folder (e.g. plots, samples, etc.)
-    if os.path.exists(os.path.join(save_dir, 'configs')):
-        print('Saved Config Directory Already Exists - if continue will overwrite files inside. Press c to continue.')
-        pdb.set_trace()
-    else:
-        os.makedirs(os.path.join(save_dir, 'configs'))
+    os.makedirs(os.path.join(save_dir, 'configs'), exist_ok=True)
 
     # Save the json copy
     with open(os.path.join(save_dir, 'configs', 'config_file.json'), 'w+') as f:
@@ -154,8 +158,7 @@ def create_datloaders(batchsize=100, dataset="dummy", base_path='dummy'):
 
 
     else:
-        print('Not done yet')
-        pdb.set_trace()
+        raise ValueError(f"Unsupported dataset: {dataset}")
 
 
 
@@ -165,7 +168,7 @@ def create_datloaders(batchsize=100, dataset="dummy", base_path='dummy'):
                                                    num_workers=1,
                                                    drop_last=True)
 
-    if val_data != None:
+    if val_data is not None:
         val_dataloader = torch.utils.data.DataLoader(val_data,
                                                     batch_size=batchsize,
                                                     shuffle=False,
@@ -247,6 +250,9 @@ if __name__ == '__main__':
 
     # (6) Setting up the comet logger
     if args.comet_log:
+        if not HAS_COMET:
+            raise ImportError("--comet_log was specified but comet_ml is not installed. "
+                              "Install it with: pip install comet-ml")
         # Create an experiment with your api key
         comet_logger = comet_ml.Experiment(
             api_key=config['comet_config']['api_key'],
@@ -256,9 +262,8 @@ if __name__ == '__main__':
         comet_logger.add_tag(args.comet_tag)
         comet_logger.set_name(args.comet_name)
     else:
-        print('PROBLEM: not saving to comet')
-        comet_logger = None
-        pdb.set_trace()
+        print('Comet logging disabled, using print-based logger as fallback.')
+        comet_logger = PrintLogger()
 
     # (7) Set up GPU / CPU
     if torch.cuda.is_available() and args.model_init_num_gpus >= 0:

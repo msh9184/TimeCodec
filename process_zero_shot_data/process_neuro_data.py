@@ -1,6 +1,5 @@
 import argparse
 import numpy as np
-import pdb
 import xarray as xr
 import os
 
