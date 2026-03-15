@@ -190,7 +190,7 @@ def collect_imputation(results_dir):
                 dataset = 'unknown'
 
             basename = os.path.basename(filepath)
-            mr_match = re.search(r'mr([\d.]+)', basename)
+            mr_match = re.search(r'mr(\d+\.?\d*)', basename)
             mask_ratio = float(mr_match.group(1)) if mr_match else 0.0
 
             metrics = parse_imputation_log(filepath)
@@ -364,6 +364,9 @@ def main():
     print("=" * 60)
     print("  TimeCodec Results Collector")
     print("=" * 60)
+
+    # Ensure output directory exists
+    os.makedirs(args.output, exist_ok=True)
 
     # Collect results
     print("\nCollecting forecasting results...")
