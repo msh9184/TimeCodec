@@ -77,7 +77,7 @@ def start_training(device, vqvae_config, save_dir, logger, data_init_loc, args):
 
     if vqvae_config['pretrained']:
         # pretrained needs to be the path to the trained model if you want it to load
-        model = torch.load(vqvae_config['pretrained'])  # Get saved pytorch model.
+        model = torch.load(vqvae_config['pretrained'], weights_only=False)  # Get saved pytorch model.
     summary['vqvae_config'] = vqvae_config  # add the model information to the summary
 
     # Start training the model

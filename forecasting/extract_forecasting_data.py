@@ -104,7 +104,7 @@ class ExtractData:
 
     def extract_data(self):
         device = 'cuda:' + str(self.args.gpu)
-        vqvae_model = torch.load(self.args.trained_vqvae_model_path)
+        vqvae_model = torch.load(self.args.trained_vqvae_model_path, weights_only=False)
         vqvae_model.to(device)
         vqvae_model.eval()
 

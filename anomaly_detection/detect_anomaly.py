@@ -179,7 +179,7 @@ def adjustment(gt, pred):
 
 def test(args):
     device = 'cuda:' + str(args.gpu)
-    vqvae_model = torch.load(args.trained_vqvae_model_path)
+    vqvae_model = torch.load(args.trained_vqvae_model_path, weights_only=False)
     vqvae_model.to(device)
     vqvae_model.eval()
 
@@ -187,7 +187,7 @@ def test(args):
 
     attens_energy = []
 
-    anomaly_criterion = nn.MSELoss(reduce=False)
+    anomaly_criterion = nn.MSELoss(reduction='none')
 
     # (1) statistic on the train set
     with torch.no_grad():

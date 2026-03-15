@@ -141,10 +141,10 @@ def eval(args):
     norcal_dataloader = None
 
     # ------- MODEL: XCODES TO YTIME -------- #
-    model_decode = torch.load(args.model_load_path + 'decode_checkpoint.pth')
+    model_decode = torch.load(args.model_load_path + 'decode_checkpoint.pth', weights_only=False)
 
     # ------- MODEL: MuStd ----------#
-    model_mustd = torch.load(args.model_load_path + 'mustd_checkpoint.pth')
+    model_mustd = torch.load(args.model_load_path + 'mustd_checkpoint.pth', weights_only=False)
     model_mustd.revin_in = RevIN(
         num_features=Sin, affine=is_affine_revin
     )  # expects as input (B, T, S)
