@@ -148,7 +148,7 @@ generate_report() {
             echo ""
             printf "%-10s %-8s %-10s %-10s %-10s\n" "Dataset" "Horizon" "MSE" "MAE" "Corr"
             printf "%-10s %-8s %-10s %-10s %-10s\n" "-------" "-------" "--------" "--------" "--------"
-            for f in forecasting/results/${DATASET}/*.txt 2>/dev/null; do
+            for f in $(ls forecasting/results/${DATASET}/*.txt 2>/dev/null); do
                 if [[ -f "$f" ]]; then
                     cat "$f"
                 fi
@@ -162,7 +162,7 @@ generate_report() {
                 echo ""
                 printf "%-10s %-8s %-10s %-10s %-10s\n" "Dataset" "Horizon" "MSE" "MAE" "Corr"
                 printf "%-10s %-8s %-10s %-10s %-10s\n" "-------" "-------" "--------" "--------" "--------"
-                for f in forecasting/results/${DATASET}_pretrained/*.txt 2>/dev/null; do
+                for f in $(ls forecasting/results/${DATASET}_pretrained/*.txt 2>/dev/null); do
                     if [[ -f "$f" ]]; then
                         cat "$f"
                     fi
