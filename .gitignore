@@ -57,5 +57,20 @@ outputs/
 results/
 .claude
 
+# Experiment artifacts (preprocessed data, trained models, numpy arrays)
+forecasting/data/
+forecasting/saved_models/
+forecasting/results/
+anomaly_detection/data/
+anomaly_detection/saved_models/
+anomaly_detection/results/
+imputation/data/
+imputation/saved_models/
+imputation/results/
+process_zero_shot_data/data/
+*.npy
+*.pth
+*.pkl
+
 # Error log
 errlog*

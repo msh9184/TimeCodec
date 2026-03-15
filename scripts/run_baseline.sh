@@ -82,7 +82,7 @@ declare -A AD_DATASETS=(
     [PSM]="25:100:30000:1.0"
     [SMAP]="25:100:30000:1.0"
     [SMD]="38:100:60000:0.5"
-    [SWaT]="51:100:60000:1.0"
+    [SWAT]="51:100:60000:1.0"
 )
 
 declare -A IM_DATASETS=(
@@ -354,7 +354,12 @@ run_anomaly_detection() {
     local seq_len=$(echo "$info" | cut -d: -f2)
     local num_itr=$(echo "$info" | cut -d: -f3)
     local anomaly_ratio=$(echo "$info" | cut -d: -f4)
-    local ad_data_root="${DATA_ROOT}/anomaly_detection/${ds}"
+    # Map dataset name to actual directory (handles case differences like SWAT -> SWaT)
+    local data_dir="$ds"
+    if [[ "$ds" == "SWAT" ]] && [[ -d "${DATA_ROOT}/anomaly_detection/SWaT" ]]; then
+        data_dir="SWaT"
+    fi
+    local ad_data_root="${DATA_ROOT}/anomaly_detection/${data_dir}"
 
     log "=== Anomaly Detection: ${ds} (vars=${num_vars}, seq=${seq_len}) ==="
 
@@ -507,7 +512,7 @@ if [[ "$DATASET" == "all" ]]; then
         forecasting)
             DATASETS=(ETTh1 ETTh2 ETTm1 ETTm2 weather electricity traffic) ;;
         anomaly_detection)
-            DATASETS=(SMD MSL PSM SMAP SWaT) ;;
+            DATASETS=(SMD MSL PSM SMAP SWAT) ;;
         imputation)
             DATASETS=(ETTh1 ETTh2 ETTm1 ETTm2 weather electricity) ;;
         *)
